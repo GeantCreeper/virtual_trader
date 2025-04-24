@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : mar. 15 avr. 2025 à 21:42
+-- Généré le : jeu. 24 avr. 2025 à 16:16
 -- Version du serveur : 10.10.2-MariaDB
 -- Version de PHP : 8.0.26
 
@@ -24,72 +24,79 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Structure de la table `action`
+-- Structure de la table `actions`
 --
 
-DROP TABLE IF EXISTS `action`;
-CREATE TABLE IF NOT EXISTS `action` (
-  `action_code` int(11) NOT NULL AUTO_INCREMENT,
-  `wallet_id` int(11) DEFAULT NULL,
-  `description` varchar(255) NOT NULL,
+DROP TABLE IF EXISTS `actions`;
+CREATE TABLE IF NOT EXISTS `actions` (
+  `action_id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
   `price` float NOT NULL,
   `annual_dividend` float NOT NULL,
   `dividend_date` int(11) NOT NULL,
-  PRIMARY KEY (`action_code`),
-  KEY `fk_wallet` (`wallet_id`)
+  PRIMARY KEY (`action_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
--- Déchargement des données de la table `action`
+-- Déchargement des données de la table `actions`
 --
 
-INSERT INTO `action` (`action_code`, `wallet_id`, `description`, `price`, `annual_dividend`, `dividend_date`) VALUES
-(1, NULL, 'Apple', 198.15, 0.05, 12),
-(2, NULL, 'Microsoft', 388.45, 0.24, 8),
-(3, NULL, 'Nvidia', 110.93, 0.17, 4),
-(4, NULL, 'Amazon', 184.87, 0.03, 6),
-(5, NULL, 'Google', 159.4, 0.02, 8),
-(6, NULL, 'Facebook', 543.57, 0.05, 9),
-(7, NULL, 'Tesla', 252.24, 0.15, 10),
-(8, NULL, 'Walmart', 92.8, 0.01, 3),
-(9, NULL, 'Visa', 333.4, 0.04, 12),
-(10, NULL, 'Tencent', 57.68, 0.13, 5);
+INSERT INTO `actions` (`action_id`, `name`, `price`, `annual_dividend`, `dividend_date`) VALUES
+(1, 'Apple', 198.15, 0.05, 12),
+(2, 'Microsoft', 388.45, 0.24, 8),
+(3, 'Nvidia', 110.93, 0.17, 4),
+(4, 'Amazon', 184.87, 0.03, 6),
+(5, 'Google', 159.4, 0.02, 8),
+(6, 'Facebook', 543.57, 0.05, 9),
+(7, 'Tesla', 252.24, 0.15, 10),
+(8, 'Walmart', 92.8, 0.01, 3),
+(9, 'Visa', 333.4, 0.04, 12),
+(10, 'Tencent', 57.68, 0.13, 5);
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `history`
+-- Structure de la table `action_history`
 --
 
-DROP TABLE IF EXISTS `history`;
-CREATE TABLE IF NOT EXISTS `history` (
-  `history_id` int(11) NOT NULL AUTO_INCREMENT,
-  `action_code` int(11) NOT NULL,
-  `value` float NOT NULL,
-  `history_date` date NOT NULL,
-  PRIMARY KEY (`history_id`),
-  KEY `fk_history_action_code` (`action_code`)
+DROP TABLE IF EXISTS `action_history`;
+CREATE TABLE IF NOT EXISTS `action_history` (
+  `action_id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `price` float NOT NULL,
+  PRIMARY KEY (`action_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
 --
--- Structure de la table `transaction`
+-- Structure de la table `transactions`
 --
 
-DROP TABLE IF EXISTS `transaction`;
-CREATE TABLE IF NOT EXISTS `transaction` (
+DROP TABLE IF EXISTS `transactions`;
+CREATE TABLE IF NOT EXISTS `transactions` (
   `transaction_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
-  `action_code` int(11) NOT NULL,
+  `action_id` int(11) NOT NULL,
   `value` float NOT NULL,
   `quantity` int(11) NOT NULL,
   `transaction_type` varchar(255) NOT NULL,
   `transaction_date` date NOT NULL,
   PRIMARY KEY (`transaction_id`),
-  KEY `fk_transaction_user_id` (`user_id`),
-  KEY `fk_transaction_action_code` (`action_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  KEY `user_id` (`user_id`),
+  KEY `action_id` (`action_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Déchargement des données de la table `transactions`
+--
+
+INSERT INTO `transactions` (`transaction_id`, `user_id`, `action_id`, `value`, `quantity`, `transaction_type`, `transaction_date`) VALUES
+(12, 1, 1, 198.15, 4, 'buy', '2025-04-24'),
+(13, 1, 6, 543.57, 7, 'buy', '2025-04-24'),
+(14, 1, 1, 198.15, 2, 'sell', '2025-04-24'),
+(15, 2, 6, 543.57, 15, 'buy', '2025-04-24'),
+(16, 1, 2, 388.45, 3, 'buy', '2025-04-24');
 
 -- --------------------------------------------------------
 
@@ -104,15 +111,15 @@ CREATE TABLE IF NOT EXISTS `user` (
   `password` varchar(255) NOT NULL,
   `money` float NOT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Déchargement des données de la table `user`
 --
 
 INSERT INTO `user` (`user_id`, `username`, `password`, `money`) VALUES
-(3, 'jean', '$2y$10$pNj51DKnYFrHfznWLDRjlOWWdyRrV56wjOp6psj6Mzl5a0CKAlxlO', 10000),
-(5, 'joe baiden', '$2y$10$42xnOEiZqfCfDg1RZbTB4ObtstdT4qT3tmNNQP16kp/fGinYQkTv6', 10000);
+(1, 'jean', '$2y$10$LtepU/pIe2isLklJ4daNqu3n0E29uoO07J2xgcOUCh3oVbZnJ17qW', 4633.36),
+(2, 'bob', '$2y$10$yK12UFT6SJ3KlSPzs1Wgu.chB3U2IXh7ck7.L9VvjpUTYt.b0zGXG', 1846.45);
 
 -- --------------------------------------------------------
 
@@ -122,42 +129,46 @@ INSERT INTO `user` (`user_id`, `username`, `password`, `money`) VALUES
 
 DROP TABLE IF EXISTS `wallet`;
 CREATE TABLE IF NOT EXISTS `wallet` (
-  `wallet_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
-  `value` float NOT NULL,
-  `update_date` date NOT NULL,
-  PRIMARY KEY (`wallet_id`),
-  KEY `fk_wallet_user_id` (`user_id`)
+  `action_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`action_id`),
+  KEY `action_id` (`action_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Déchargement des données de la table `wallet`
+--
+
+INSERT INTO `wallet` (`user_id`, `action_id`, `quantity`) VALUES
+(1, 1, 2),
+(1, 2, 3),
+(1, 6, 7),
+(2, 6, 15);
 
 --
 -- Contraintes pour les tables déchargées
 --
 
 --
--- Contraintes pour la table `action`
+-- Contraintes pour la table `action_history`
 --
-ALTER TABLE `action`
-  ADD CONSTRAINT `fk_wallet` FOREIGN KEY (`wallet_id`) REFERENCES `wallet` (`wallet_id`);
+ALTER TABLE `action_history`
+  ADD CONSTRAINT `action_history_ibfk_1` FOREIGN KEY (`action_id`) REFERENCES `actions` (`action_id`);
 
 --
--- Contraintes pour la table `history`
+-- Contraintes pour la table `transactions`
 --
-ALTER TABLE `history`
-  ADD CONSTRAINT `fk_history_action_code` FOREIGN KEY (`action_code`) REFERENCES `action` (`action_code`);
-
---
--- Contraintes pour la table `transaction`
---
-ALTER TABLE `transaction`
-  ADD CONSTRAINT `fk_transaction_action_code` FOREIGN KEY (`action_code`) REFERENCES `action` (`action_code`),
-  ADD CONSTRAINT `fk_transaction_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+ALTER TABLE `transactions`
+  ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`action_id`) REFERENCES `actions` (`action_id`),
+  ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
 
 --
 -- Contraintes pour la table `wallet`
 --
 ALTER TABLE `wallet`
-  ADD CONSTRAINT `fk_wallet_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`);
+  ADD CONSTRAINT `wallet_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
+  ADD CONSTRAINT `wallet_ibfk_2` FOREIGN KEY (`action_id`) REFERENCES `actions` (`action_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
