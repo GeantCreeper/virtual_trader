@@ -1,10 +1,11 @@
 <!-- filepath: c:\wamp64\www\virtual_trader\php\sell.php -->
+<link rel="stylesheet" type="text/css" href="../css/style.css">
 <?php
 session_start();
 
 // Vérifie si l'utilisateur est connecté
 if (!isset($_SESSION['user'])) {
-    echo "<p style='color: red;'>Vous devez être connecté pour vendre des actions.</p>";
+    echo "<p class='error'>Vous devez être connecté pour vendre des actions.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -26,7 +27,7 @@ if ($connexion->connect_error) {
 $action_id = $_POST['action_id'];
 $quantity = intval($_POST['quantity']); // Récupère la quantité saisie
 if ($quantity <= 0) {
-    echo "<p style='color: red;'>La quantité doit être supérieure à 0.</p>";
+    echo "<p class='error'>La quantité doit être supérieure à 0.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -37,7 +38,7 @@ $stmt_user_id->bind_param("s", $user);
 $stmt_user_id->execute();
 $result_user_id = $stmt_user_id->get_result();
 if ($result_user_id->num_rows === 0) {
-    echo "<p style='color: red;'>Utilisateur introuvable.</p>";
+    echo "<p class='error'>Utilisateur introuvable.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -50,7 +51,7 @@ $stmt_wallet->bind_param("ii", $user_id, $action_id);
 $stmt_wallet->execute();
 $result_wallet = $stmt_wallet->get_result();
 if ($result_wallet->num_rows === 0) {
-    echo "<p style='color: red;'>Vous ne possédez pas cette action.</p>";
+    echo "<p class='error'>Vous ne possédez pas cette action.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -58,7 +59,7 @@ $wallet_quantity = $result_wallet->fetch_assoc()['quantity'];
 $stmt_wallet->close();
 
 if ($wallet_quantity < $quantity) {
-    echo "<p style='color: red;'>Vous ne possédez pas suffisamment d'actions pour cette vente.</p>";
+    echo "<p class='error'>Vous ne possédez pas suffisamment d'actions pour cette vente.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -69,7 +70,7 @@ $stmt_action_price->bind_param("i", $action_id);
 $stmt_action_price->execute();
 $result_action_price = $stmt_action_price->get_result();
 if ($result_action_price->num_rows === 0) {
-    echo "<p style='color: red;'>Action introuvable.</p>";
+    echo "<p class='error'>Action introuvable.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -114,7 +115,7 @@ $stmt_update_money->bind_param("di", $total_value, $user_id);
 $stmt_update_money->execute();
 $stmt_update_money->close();
 
-echo "<p style='color: green;'>Vente réalisée avec succès !</p>";
+echo "<p class='success'>Vente réalisée avec succès !</p>";
 
 $connexion->close();
 header("Refresh: 2; url=../index.php?p=actions");

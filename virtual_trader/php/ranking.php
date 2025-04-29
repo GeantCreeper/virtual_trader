@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="../css/connexion.css">
+        <link rel="stylesheet" type="text/css" href="css/style.css">
         <title>Classement des joueurs</title>
     </head>
     <body>
@@ -54,7 +54,7 @@
                 }
                 echo "</table>";
             } else {
-                echo "<p>Aucun joueur trouvé.</p>";
+                echo "<p class='error'>Aucun joueur trouvé.</p>";
             }
 
             $requete->close();
@@ -127,12 +127,12 @@
                     }
                     echo "</table>";
                 } else {
-                    echo "<p>Aucune transaction trouvée pour cet utilisateur.</p>";
+                    echo "<p class='error'>Aucune transaction trouvée pour cet utilisateur.</p>";
                 }
 
                 $requete_transactions->close();
             } else {
-                echo "<p>Aucun utilisateur trouvé avec cet identifiant.</p>";
+                echo "<p class='error'>Aucun utilisateur trouvé avec cet identifiant.</p>";
             }
 
             $requete->close();

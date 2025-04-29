@@ -1,4 +1,5 @@
 <!-- Ce fichier permet de présenter le site -->
+<link rel="stylesheet" type="text/css" href="css/style.css">
 <?php
 if (!isset($_SESSION['user'])) {
     echo "<p style='color: red;'>Vous devez être connecté pour accéder au tableau de bord.</p>";

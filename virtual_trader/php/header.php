@@ -1,4 +1,5 @@
 <!-- Ce fichier permet d'afficher le menu qui redirige vers d'autres pages -->
+<link rel="stylesheet" type="text/css" href="css/style.css">
 <header>
 <h1>
     <span class="header1"><a href="index.php?p=dashboard"> Tableau de bord </a></span>

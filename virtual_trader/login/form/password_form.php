@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="../css/connexion.css">
+        <link rel="stylesheet" type="text/css" href="../../css/style.css">
         <title> Changer de mot de passe </title>
     </head>
     <body>

@@ -11,11 +11,11 @@ $user = $_SESSION['user']; // Récupère l'utilisateur connecté
 <html>
     <head>
         <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="../css/connexion.css">
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
         <title>Portfolio de <?php echo htmlspecialchars($user); ?></title>
     </head>
-    <form action="index.php?p=actions" method="post" style="margin-bottom: 20px;">
-    <button type="submit">Voir les actions disponibles</button>
+    <form action="index.php?p=actions" method="post">
+    <button type="submit" class="return">Voir les actions disponibles</button>
     </form>
     <body>
         <h1>Portfolio de <?php echo htmlspecialchars($user); ?></h1>

@@ -1,10 +1,11 @@
 <!-- filepath: c:\wamp64\www\virtual_trader\php\buy.php -->
+<link rel="stylesheet" type="text/css" href="../css/style.css">
 <?php
 session_start();
 
 // Vérifie si l'utilisateur est connecté
 if (!isset($_SESSION['user'])) {
-    echo "<p style='color: red;'>Vous devez être connecté pour acheter des actions.</p>";
+    echo "<p class='error'>Vous devez être connecté pour acheter des actions.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -26,7 +27,7 @@ if ($connexion->connect_error) {
 $action_id = $_POST['action_id'];
 $quantity = intval($_POST['quantity']); // Récupère la quantité saisie
 if ($quantity <= 0) {
-    echo "<p style='color: red;'>La quantité doit être supérieure à 0.</p>";
+    echo "<p class='error'>La quantité doit être supérieure à 0.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -37,7 +38,7 @@ $stmt_user_id->bind_param("s", $user);
 $stmt_user_id->execute();
 $result_user_id = $stmt_user_id->get_result();
 if ($result_user_id->num_rows === 0) {
-    echo "<p style='color: red;'>Utilisateur introuvable.</p>";
+    echo "<p class='error'>Utilisateur introuvable.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -52,7 +53,7 @@ $stmt_action_price->bind_param("i", $action_id);
 $stmt_action_price->execute();
 $result_action_price = $stmt_action_price->get_result();
 if ($result_action_price->num_rows === 0) {
-    echo "<p style='color: red;'>Action introuvable.</p>";
+    echo "<p class='error'>Action introuvable.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -62,7 +63,7 @@ $stmt_action_price->close();
 // Calcule le coût total
 $total_cost = $quantity * $action_price;
 if ($user_money < $total_cost) {
-    echo "<p style='color: red;'>Fonds insuffisants pour effectuer cet achat.</p>";
+    echo "<p class='error'>Fonds insuffisants pour effectuer cet achat.</p>";
     header("Refresh: 2; url=../index.php?p=actions");
     exit();
 }
@@ -102,7 +103,7 @@ $stmt_update_money->bind_param("di", $new_money, $user_id);
 $stmt_update_money->execute();
 $stmt_update_money->close();
 
-echo "<p style='color: green;'>Achat effectué avec succès !</p>";
+echo "<p class='success'>Achat effectué avec succès !</p>";
 
 $connexion->close();
 header("Refresh: 2; url=../index.php?p=actions");
