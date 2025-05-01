@@ -11,6 +11,17 @@ if ($connexion->connect_error) {
     die("Erreur de connexion : " . $connexion->connect_error);
 }
 
+// Récupère la date fictive actuelle
+$stmt_date = $connexion->prepare("SELECT actual_date FROM game_state");
+$stmt_date->execute();
+$result_date = $stmt_date->get_result();
+if ($result_date->num_rows > 0) {
+    $fictive_date = $result_date->fetch_assoc()['actual_date'];
+} else {
+    die("Erreur : Impossible de récupérer la date fictive.");
+}
+$stmt_date->close();
+
 // Étape 1 : Augmenter la date du jeu d'un mois
 $connexion->query("UPDATE game_state SET actual_date = DATE_ADD(actual_date, INTERVAL 1 MONTH)");
 
@@ -59,17 +70,46 @@ while ($row = $result_prix->fetch_assoc()) {
 
     // Met à jour le prix de l'action
     $stmt_update_price = $connexion->prepare("UPDATE actions SET price = ? WHERE action_id = ?");
-    $stmt_update_price->bind_param("di", $nouveau_prix, $action_id);
+    $stmt_update_price->bind_param("id", $nouveau_prix, $action_id);
     $stmt_update_price->execute();
     $stmt_update_price->close();
 
     // Enregistre l'historique du prix
-    $stmt_insert_history = $connexion->prepare("INSERT INTO action_history (action_id, date, price) VALUES (?, CURDATE(), ?)");
-    $stmt_insert_history->bind_param("id", $action_id, $nouveau_prix);
+    $stmt_insert_history = $connexion->prepare("INSERT INTO action_history (action_id, date, price) VALUES (?, ?, ?)");
+    $stmt_insert_history->bind_param("isd", $action_id, $fictive_date, $nouveau_prix);
     $stmt_insert_history->execute();
     $stmt_insert_history->close();
 }
 $requete_prix->close();
+
+// Étape 4 : Enregistrer la valeur totale du portefeuille dans portfolio_history
+$stmt_users = $connexion->prepare("SELECT user_id FROM user");
+$stmt_users->execute();
+$result_users = $stmt_users->get_result();
+
+while ($user = $result_users->fetch_assoc()) {
+    $user_id = $user['user_id'];
+
+    // Calcule la valeur totale du portefeuille de l'utilisateur
+    $stmt_portfolio_value = $connexion->prepare("
+        SELECT COALESCE(SUM(w.quantity * a.price), 0) AS total_value
+        FROM wallet w
+        INNER JOIN actions a ON w.action_id = a.action_id
+        WHERE w.user_id = ?
+    ");
+    $stmt_portfolio_value->bind_param("i", $user_id);
+    $stmt_portfolio_value->execute();
+    $result_portfolio_value = $stmt_portfolio_value->get_result();
+    $portfolio_value = $result_portfolio_value->fetch_assoc()['total_value'];
+    $stmt_portfolio_value->close();
+
+    // Insère la valeur totale dans portfolio_history
+    $stmt_insert_history = $connexion->prepare("INSERT INTO portfolio_history (user_id, total_value, date) VALUES (?, ?, ?)");
+    $stmt_insert_history->bind_param("ids", $user_id, $portfolio_value, $fictive_date);
+    $stmt_insert_history->execute();
+    $stmt_insert_history->close();
+}
+$stmt_users->close();
 
 echo "Mise à jour du jeu effectuée avec succès.";
 $connexion->close();

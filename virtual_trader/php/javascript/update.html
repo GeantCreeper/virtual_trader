@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
-<meta charset="UTF-8">
 <head>
-    <title>Auto Update</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update</title>
 </head>
 <body>
-    <h1>Le jeu est en cours de mise à jour toutes les minutes...</h1>
+    <h1>Le jeu est en cours de mise à jour...</h1>
+    <p>Vous pouvez revenir à la page principale.</p>
+   
     <script>
         // Exécute une requête toutes les minutes
         setInterval(() => {
-            fetch('http://localhost/virtual_trader/php/update.php')
+            fetch('/virtual_trader/php/update.php')
                 .then(response => console.log('Mise à jour effectuée'))
                 .catch(error => console.error('Erreur lors de la mise à jour', error));
         }, 60000); // 60000 ms = 1 minute

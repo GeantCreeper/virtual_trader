@@ -90,11 +90,12 @@
 
                 // Récupère les transactions de l'utilisateur
                 $requete_transactions = $connexion->prepare("
-                    SELECT t.transaction_type, t.quantity, t.value, t.transaction_date, a.name AS action_name
+                    SELECT t.transaction_type, t.quantity, (t.quantity * t.value) AS total_value, t.transaction_date, a.name AS action_name
                     FROM transactions t
                     INNER JOIN actions a ON t.action_id = a.action_id
                     INNER JOIN user u ON t.user_id = u.user_id
                     WHERE u.username LIKE CONCAT('%', ?, '%')
+                    AND t.transaction_date <= (SELECT actual_date FROM game_state)
                     ORDER BY t.transaction_date DESC
                     LIMIT 10
                 ");
@@ -121,7 +122,7 @@
                                 <td>" . htmlspecialchars($transaction['transaction_type']) . "</td>
                                 <td>" . htmlspecialchars($transaction['action_name']) . "</td>
                                 <td>" . htmlspecialchars($transaction['quantity']) . "</td>
-                                <td>" . htmlspecialchars($transaction['value']) . "</td>
+                                <td>" . htmlspecialchars($transaction['total_value']) . "</td>
                                 <td>" . htmlspecialchars($transaction['transaction_date']) . "</td>
                               </tr>";
                     }

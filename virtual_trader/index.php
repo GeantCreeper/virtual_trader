@@ -1,5 +1,10 @@
 <?php 
     session_start();
+    if (isset($_SESSION['open_update']) && $_SESSION['open_update'] === true) {
+        // Supprime la variable de session pour éviter d'ouvrir plusieurs fois
+        unset($_SESSION['open_update']);
+        echo "<script>window.open('../virtual_trader/php/javascript/update.html', '_blank');</script>";
+    }
     if (!isset($_SESSION['user'])) {
         // Redirige vers le formulaire de connexion si aucune session utilisateur n'est active
         header('Location: ./login/form/login_form.php');

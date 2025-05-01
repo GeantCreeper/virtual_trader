@@ -77,9 +77,9 @@
 
         if (!empty($_POST['progression'])) {
             if ($_POST['progression'] == "1_month") {
-                $conditions[] = "price >= (SELECT price FROM action_history WHERE action_id = actions.action_id AND date = DATE_SUB(CURDATE(), INTERVAL 1 MONTH))";
+                $conditions[] = "price >= (SELECT price FROM action_history WHERE action_id = actions.action_id AND date = DATE_SUB((SELECT actual_date FROM game_state), INTERVAL 1 MONTH))";
             } elseif ($_POST['progression'] == "1_year") {
-                $conditions[] = "price >= (SELECT price FROM action_history WHERE action_id = actions.action_id AND date = DATE_SUB(CURDATE(), INTERVAL 1 YEAR))";
+                $conditions[] = "price >= (SELECT price FROM action_history WHERE action_id = actions.action_id AND date = DATE_SUB((SELECT actual_date FROM game_state), INTERVAL 1 YEAR))";
             }
         }
 

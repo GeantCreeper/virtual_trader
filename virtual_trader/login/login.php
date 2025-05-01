@@ -28,7 +28,10 @@ if (isset($_POST['user']) && isset($_POST['password']))  // si le compte et le m
                 if (password_verify($password, $hashed_password)) // vérifie le mot de passe
                     {
                         $_SESSION['user'] = $user;
-                        header('location: ../index.php');
+                        $_SESSION['open_update'] = true;
+                        // Redirige vers index.php
+                        header('Location: ../index.php');
+                        exit();
                     } 
                 else 
                     {
