@@ -1,4 +1,3 @@
-<!-- filepath: c:\wamp64\www\virtual_trader\php\sell.php -->
 <link rel="stylesheet" type="text/css" href="../css/style.css">
 <?php
 session_start();

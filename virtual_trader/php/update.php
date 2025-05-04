@@ -1,4 +1,3 @@
-<!-- filepath: c:\wamp64\www\virtual_trader\php\update.php -->
 <?php
 // Connexion à la base de données
 $serveur = "localhost:3307";
@@ -103,13 +102,33 @@ while ($user = $result_users->fetch_assoc()) {
     $portfolio_value = $result_portfolio_value->fetch_assoc()['total_value'];
     $stmt_portfolio_value->close();
 
-    // Insère la valeur totale dans portfolio_history
-    $stmt_insert_history = $connexion->prepare("INSERT INTO portfolio_history (user_id, total_value, date) VALUES (?, ?, ?)");
-    $stmt_insert_history->bind_param("ids", $user_id, $portfolio_value, $fictive_date);
-    $stmt_insert_history->execute();
-    $stmt_insert_history->close();
+    // Vérifie si une entrée existe déjà pour cet utilisateur et cette date
+    $stmt_check = $connexion->prepare("
+        SELECT COUNT(*) AS count
+        FROM portfolio_history
+        WHERE user_id = ? AND date = ?
+    ");
+    $stmt_check->bind_param("is", $user_id, $fictive_date);
+    $stmt_check->execute();
+    $result_check = $stmt_check->get_result();
+    $row_check = $result_check->fetch_assoc();
+    $stmt_check->close();
+
+    // Si aucune entrée n'existe, insère une nouvelle ligne
+    if ($row_check['count'] == 0) {
+        $stmt_insert_history = $connexion->prepare("INSERT INTO portfolio_history (user_id, value, date) VALUES (?, ?, ?)");
+        if (!$stmt_insert_history) {
+            die("Erreur dans la requête SQL : " . $connexion->error);
+        }
+        $stmt_insert_history->bind_param("ids", $user_id, $portfolio_value, $fictive_date);
+        $stmt_insert_history->execute();
+        $stmt_insert_history->close();
+    }
 }
 $stmt_users->close();
+
+// Indique qu'une mise à jour a été effectuée
+file_put_contents(__DIR__ . '/javascript/update_flag.txt', time());
 
 echo "Mise à jour du jeu effectuée avec succès.";
 $connexion->close();

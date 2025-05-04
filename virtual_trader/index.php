@@ -3,7 +3,9 @@
     if (isset($_SESSION['open_update']) && $_SESSION['open_update'] === true) {
         // Supprime la variable de session pour éviter d'ouvrir plusieurs fois
         unset($_SESSION['open_update']);
-        echo "<script>window.open('../virtual_trader/php/javascript/update.html', '_blank');</script>";
+        echo "<script>window.open('./php/javascript/update.html', '_blank', 'width=800,height=600');</script>";
+
+
     }
     if (!isset($_SESSION['user'])) {
         // Redirige vers le formulaire de connexion si aucune session utilisateur n'est active
@@ -12,7 +14,7 @@
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="fr">
     <?php 
         $page=isset($_GET['p'])?$_GET['p']:'dashboard';
         //permet de donner le titre de la page d'après son nom
@@ -35,10 +37,11 @@
     ?>
     <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="css/menu.css">
         <!-- applique le code précédent -->
         <title>
-            <?php echo $titlename ?>
+            <?php echo htmlspecialchars($titlename); ?>
         </title>
     </head>
 

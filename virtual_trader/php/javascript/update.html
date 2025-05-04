@@ -10,12 +10,22 @@
     <p>Vous pouvez revenir à la page principale.</p>
    
     <script>
+        // Crée un canal de communication
+        const bc = new BroadcastChannel('update_channel');
+    
+        // Ferme cette fenêtre si on reçoit le message de déconnexion
+        bc.addEventListener('message', (event) => {
+            if (event.data === 'closeUpdate') {
+                window.close();
+            }
+        });
+    
         // Exécute une requête toutes les minutes
         setInterval(() => {
             fetch('/virtual_trader/php/update.php')
                 .then(response => console.log('Mise à jour effectuée'))
                 .catch(error => console.error('Erreur lors de la mise à jour', error));
-        }, 60000); // 60000 ms = 1 minute
-    </script>
+        }, 60000);
+    </script>    
 </body>
 </html>

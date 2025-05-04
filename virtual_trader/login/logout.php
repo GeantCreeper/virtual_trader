@@ -1,22 +1,24 @@
 <!-- Ce fichier permet de se déconnecter -->
 <?php
-// On démarre la session
 session_start();
-
-// On stocke un message de déconnexion dans une variable temporaire
-$message = "Vous avez été déconnecté avec succès.";
-
-// On détruit les variables de session
 session_unset();
-
-// On détruit la session
 session_destroy();
-
-// On redémarre une session pour afficher le message
-session_start();
-$_SESSION['message'] = $message;
-
-// On redirige le visiteur vers la page de connexion
-header('location: form/login_form.php');
-exit();
 ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Déconnexion</title>
+    <script>
+        const bc = new BroadcastChannel('update_channel');
+        bc.postMessage('closeUpdate');
+    </script>
+</head>
+<body>
+    <p>Vous avez été déconnecté avec succès.</p>
+    <script>
+        window.location.href = '../login/form/login_form.php';
+    </script>
+</body>
+</html>
