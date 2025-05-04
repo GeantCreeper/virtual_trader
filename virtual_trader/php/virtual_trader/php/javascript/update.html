@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update</title>
+</head>
+<body>
+    <h1>Le jeu est en cours de mise à jour...</h1>
+    <p>Vous pouvez revenir à la page principale.</p>
+   
+    <script>
+        console.log('update.html chargé');
+        // Crée un canal de communication
+        const bc = new BroadcastChannel('update_channel');
+    
+        // Ferme cette fenêtre si on reçoit le message de déconnexion ou de perte
+        bc.addEventListener('message', (event) => {
+            if (event.data === 'closeUpdate' || event.data === 'playerLost') {
+                window.close();
+            }
+        });
+
+        // Vérifie périodiquement les fichiers de notification
+        setInterval(() => {
+            // Appelle update.php
+            fetch('/virtual_trader/php/update.php', { cache: 'no-store' })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Réponse de update.php :', data); // Log de la réponse
+                })
+                .catch(error => console.error('Erreur lors de l’appel à update.php :', error));
+
+            // Vérifie player_lost_flag.txt
+            fetch('/virtual_trader/php/javascript/player_lost_flag.txt', { cache: 'no-store' })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Contenu de player_lost_flag.txt :', data); // Log du contenu
+                    if (data.trim() === 'playerLost') {
+                        // Réinitialise le fichier player_lost_flag.txt
+                        fetch('/virtual_trader/php/javascript/player_lost_flag.txt', {
+                            method: 'POST',
+                            body: ''
+                        });
+                        window.close();
+                    }
+                })
+                .catch(error => console.error('Erreur lors de la vérification de player_lost_flag.txt :', error));
+
+            // Vérifie update_flag.txt
+            fetch('/virtual_trader/php/javascript/update_flag.txt', { cache: 'no-store' })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Contenu de update_flag.txt :', data); // Log du contenu
+                })
+                .catch(error => console.error('Erreur lors de la vérification de update_flag.txt :', error));
+        }, 60000); // Vérifie toutes les 60 secondes
+    </script>    
+</body>
+</html>
