@@ -131,54 +131,54 @@
                     <td>
                         <form method='post' action=''>
                             <input type='hidden' name='action_id' value='$id'>
-                            <button type='submit' name='view_evolution'>Voir l'évolution</button>
+                            <button type='submit' name='view_evolution' value='$id'>Voir l'évolution</button>
                         </form>
                     </td>
                   </tr>";
+
+            // Afficher l'évolution si demandée
+            if (isset($_POST['view_evolution']) && $_POST['view_evolution'] == $id) {
+                $stmt_evolution = $connexion->prepare("
+                    SELECT DATE_FORMAT(date, '%Y-%m') AS month, price
+                    FROM action_history
+                    WHERE action_id = ?
+                    ORDER BY date DESC
+                    LIMIT 12
+                ");
+                if (!$stmt_evolution) {
+                    die("Erreur dans la requête SQL : " . $connexion->error);
+                }
+
+                $stmt_evolution->bind_param("i", $id);
+                $stmt_evolution->execute();
+                $result_evolution = $stmt_evolution->get_result();
+
+                if ($result_evolution->num_rows > 0) {
+                    echo "<tr><td colspan='5'>
+                            <h3>Évolution du prix sur 12 mois pour $nom</h3>
+                            <table border='1' style='width: 100%; margin: 10px 0;'>
+                                <tr>
+                                    <th>Mois</th>
+                                    <th>Prix (€)</th>
+                                </tr>";
+                    while ($evolution_row = $result_evolution->fetch_assoc()) {
+                        echo "<tr>
+                                <td>" . htmlspecialchars($evolution_row['month']) . "</td>
+                                <td>" . htmlspecialchars(number_format($evolution_row['price'], 2)) . "</td>
+                              </tr>";
+                    }
+                    echo "</table>
+                          </td></tr>";
+                } else {
+                    echo "<tr><td colspan='5'><p>Aucune donnée d'évolution disponible pour cette action.</p></td></tr>";
+                }
+
+                $stmt_evolution->close();
+            }
         }
         echo "</table>";
     } else {
         echo "<p>Aucune action trouvée.</p>";
-    }
-
-    // Affiche l'évolution du prix d'une action sur 12 mois
-    if (isset($_POST['view_evolution']) && !empty($_POST['action_id'])) {
-        $action_id = $_POST['action_id'];
-
-        $stmt_evolution = $connexion->prepare("
-            SELECT DATE_FORMAT(date, '%Y-%m') AS month, price
-            FROM action_history
-            WHERE action_id = ?
-            ORDER BY date DESC
-            LIMIT 12
-        ");
-        if (!$stmt_evolution) {
-            die("Erreur dans la requête SQL : " . $connexion->error);
-        }
-
-        $stmt_evolution->bind_param("i", $action_id);
-        $stmt_evolution->execute();
-        $result_evolution = $stmt_evolution->get_result();
-
-        if ($result_evolution->num_rows > 0) {
-            echo "<h2>Évolution du prix sur 12 mois</h2>";
-            echo "<table border='1'>
-                    <tr>
-                        <th>Mois</th>
-                        <th>Prix (€)</th>
-                    </tr>";
-            while ($row = $result_evolution->fetch_assoc()) {
-                echo "<tr>
-                        <td>" . htmlspecialchars($row['month']) . "</td>
-                        <td>" . htmlspecialchars(number_format($row['price'], 2)) . "</td>
-                      </tr>";
-            }
-            echo "</table>";
-        } else {
-            echo "<p>Aucune donnée d'évolution disponible pour cette action.</p>";
-        }
-
-        $stmt_evolution->close();
     }
 
     $stmt->close();

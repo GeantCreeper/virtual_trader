@@ -74,63 +74,69 @@
 
         if ($resultat->num_rows > 0) {
             echo "<h3>Résultat de la recherche :</h3>";
-            echo "<table border='1'>
-                    <tr>
+            echo "<table border='1'>";
+            while ($row = $resultat->fetch_assoc()) {
+                // Affiche les en-têtes pour chaque utilisateur
+                echo "<tr>
                         <th>Utilisateur</th>
                         <th>Argent (€)</th>
-                    </tr>";
-            while ($row = $resultat->fetch_assoc()) {
+                      </tr>";
                 echo "<tr>
                         <td>" . htmlspecialchars($row['username']) . "</td>
                         <td>" . htmlspecialchars(number_format($row['money'], 2)) . "</td>
                       </tr>";
-            }
-            echo "</table>";
 
-            // Récupère les transactions de l'utilisateur
-            $requete_transactions = $connexion->prepare("
-                SELECT t.transaction_type, t.quantity, (t.quantity * t.value) AS total_value, t.transaction_date, a.name AS action_name
-                FROM transactions t
-                INNER JOIN actions a ON t.action_id = a.action_id
-                INNER JOIN user u ON t.user_id = u.user_id
-                WHERE u.username LIKE CONCAT('%', ?, '%')
-                AND t.transaction_date <= (SELECT actual_date FROM game_state)
-                ORDER BY t.transaction_date DESC
-                LIMIT 10
-            ");
-            if (!$requete_transactions) {
-                die("Erreur de préparation de la requête : " . $connexion->error);
-            }
+                // Récupère les transactions de l'utilisateur
+                $requete_transactions = $connexion->prepare("
+                    SELECT t.transaction_type, t.quantity, (t.quantity * t.value) AS total_value, t.transaction_date, a.name AS action_name
+                    FROM transactions t
+                    INNER JOIN actions a ON t.action_id = a.action_id
+                    INNER JOIN user u ON t.user_id = u.user_id
+                    WHERE u.username = ?
+                    AND t.transaction_date <= (SELECT actual_date FROM game_state)
+                    ORDER BY t.transaction_date DESC
+                    LIMIT 10
+                ");
+                if (!$requete_transactions) {
+                    die("Erreur de préparation de la requête : " . $connexion->error);
+                }
 
-            $requete_transactions->bind_param("s", $search_user);
-            $requete_transactions->execute();
-            $resultat_transactions = $requete_transactions->get_result();
+                $requete_transactions->bind_param("s", $row['username']);
+                $requete_transactions->execute();
+                $resultat_transactions = $requete_transactions->get_result();
 
-            if ($resultat_transactions->num_rows > 0) {
-                echo "<h3>Dernières transactions :</h3>";
-                echo "<table border='1'>
-                        <tr>
-                            <th>Type</th>
-                            <th>Action</th>
-                            <th>Quantité</th>
-                            <th>Valeur (€)</th>
-                            <th>Date</th>
-                        </tr>";
-                while ($transaction = $resultat_transactions->fetch_assoc()) {
+                if ($resultat_transactions->num_rows > 0) {
                     echo "<tr>
-                            <td>" . htmlspecialchars($transaction['transaction_type']) . "</td>
-                            <td>" . htmlspecialchars($transaction['action_name']) . "</td>
-                            <td>" . htmlspecialchars($transaction['quantity']) . "</td>
-                            <td>" . htmlspecialchars(number_format($transaction['total_value'], 2)) . "</td>
-                            <td>" . htmlspecialchars($transaction['transaction_date']) . "</td>
+                            <td colspan='2'>
+                                <table border='1' style='margin: 10px;'>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Action</th>
+                                        <th>Quantité</th>
+                                        <th>Valeur (€)</th>
+                                        <th>Date</th>
+                                    </tr>";
+                    while ($transaction = $resultat_transactions->fetch_assoc()) {
+                        echo "<tr>
+                                <td>" . htmlspecialchars($transaction['transaction_type']) . "</td>
+                                <td>" . htmlspecialchars($transaction['action_name']) . "</td>
+                                <td>" . htmlspecialchars($transaction['quantity']) . "</td>
+                                <td>" . htmlspecialchars(number_format($transaction['total_value'], 2)) . "</td>
+                                <td>" . htmlspecialchars($transaction['transaction_date']) . "</td>
+                              </tr>";
+                    }
+                    echo "      </table>
+                            </td>
+                          </tr>";
+                } else {
+                    echo "<tr>
+                            <td colspan='2'><p class='error'>Aucune transaction trouvée pour cet utilisateur.</p></td>
                           </tr>";
                 }
-                echo "</table>";
-            } else {
-                echo "<p class='error'>Aucune transaction trouvée pour cet utilisateur.</p>";
-            }
 
-            $requete_transactions->close();
+                $requete_transactions->close();
+            }
+            echo "</table>";
         } else {
             echo "<p class='error'>Aucun utilisateur trouvé avec cet identifiant.</p>";
         }
