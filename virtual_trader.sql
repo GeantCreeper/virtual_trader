@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : dim. 04 mai 2025 à 22:56
+-- Généré le : lun. 05 mai 2025 à 20:11
 -- Version du serveur : 10.10.2-MariaDB
 -- Version de PHP : 8.0.26
 
@@ -43,14 +43,14 @@ CREATE TABLE IF NOT EXISTS `actions` (
 
 INSERT INTO `actions` (`action_id`, `name`, `price`, `annual_dividend`, `dividend_date`) VALUES
 (1, 'Apple', 134, 0.5, 12),
-(2, 'Microsoft', 402, 0.24, 8),
-(3, 'Nvidia', 65, 1.7, 4),
-(4, 'Amazon', 115, 0.3, 6),
-(5, 'Google', 73, 0.2, 8),
-(6, 'Facebook', 771, 0.5, 9),
+(2, 'Microsoft', 389, 0.24, 8),
+(3, 'Nvidia', 67, 1.7, 4),
+(4, 'Amazon', 117, 0.3, 6),
+(5, 'Google', 72, 0.2, 8),
+(6, 'Facebook', 786, 0.5, 9),
 (7, 'Tesla', 225, 1.5, 10),
-(8, 'Walmart', 14, 1, 3),
-(9, 'Visa', 424, 0.4, 12),
+(8, 'Walmart', 13, 1, 3),
+(9, 'Visa', 438, 0.4, 12),
 (10, 'Tencent', 1, 1.3, 5);
 
 -- --------------------------------------------------------
@@ -104,7 +104,7 @@ CREATE TABLE IF NOT EXISTS `portfolio_history` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_user_date` (`user_id`,`date`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
 
