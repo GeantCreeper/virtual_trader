@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (isset($_POST['user']) && isset($_POST['password'])) { // Vérifie si les champs sont remplis
-    $serveur = "localhost:3307"; // Nom du serveur
+    $serveur = "localhost"; // Nom du serveur
     $utilisateur = "root"; // Nom de l'utilisateur
     $motdepasse = ""; // Mot de passe
     $base_de_donnees = "virtual_trader"; // Base de données

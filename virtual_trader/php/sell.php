@@ -12,7 +12,7 @@ if (!isset($_SESSION['user'])) {
 $user = $_SESSION['user']; // Récupère l'utilisateur connecté
 
 // Connexion à la base de données
-$serveur = "localhost:3307";
+$serveur = "localhost";
 $utilisateur = "root";
 $motdepasse = "";
 $base_de_donnees = "virtual_trader";

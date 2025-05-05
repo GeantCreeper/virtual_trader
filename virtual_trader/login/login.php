@@ -2,7 +2,7 @@
 session_start();
 if (isset($_POST['user']) && isset($_POST['password']))  // si le compte et le mot de passe sont mis en place
     {
-        $serveur="localhost:3307"; // nom du serveur
+        $serveur="localhost"; // nom du serveur
         $utilisateur="root"; // nom de l'utilisateur
         $motdepasse=""; // mot de passe
         $base_de_donnees="virtual_trader"; // base de données

@@ -13,7 +13,7 @@ if (isset($_POST['user']) && isset($_POST['old_password']) && isset($_POST['new_
             exit();
         }
 
-        $serveur = "localhost:3307"; // nom du serveur
+        $serveur = "localhost"; // nom du serveur
         $utilisateur = "root"; // nom de l'utilisateur
         $motdepasse = ""; // mot de passe
         $base_de_donnees = "virtual_trader"; // base de données
