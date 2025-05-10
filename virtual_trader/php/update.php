@@ -69,7 +69,7 @@ while ($row = $result_prix->fetch_assoc()) {
 
     // Met à jour le prix de l'action
     $requete_update_price = $connexion->prepare("UPDATE actions SET price = ? WHERE action_id = ?");
-    $requete_update_price->bind_param("id", $nouveau_prix, $action_id);
+    $requete_update_price->bind_param("di", $nouveau_prix, $action_id);
     $requete_update_price->execute();
     $requete_update_price->close();
 

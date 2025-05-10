@@ -162,6 +162,10 @@
                         $prices[] = htmlspecialchars(number_format($evolution_row['price'], 2, '.', ''));
                     }
 
+                    // Inverser les données pour afficher de gauche à droite
+                    $months = array_reverse($months);
+                    $prices = array_reverse($prices);
+
                     // Convertir les données en JSON pour JavaScript
                     $months_json = json_encode($months);
                     $prices_json = json_encode($prices);
@@ -242,7 +246,7 @@
                 .catch(error => console.error('Erreur lors de la vérification de mise à jour:', error));
         }
 
-        // Vérifie toutes les 10 secondes
+        // Vérifie toutes les 5 secondes
         setInterval(checkForUpdate, 5000);
     </script>
 </body>

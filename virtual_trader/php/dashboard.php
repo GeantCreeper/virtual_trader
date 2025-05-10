@@ -199,8 +199,8 @@
                 .catch(error => console.error('Erreur lors de la vérification de mise à jour:', error));
         }
 
-        // Vérifie toutes les 10 secondes
-        setInterval(checkForUpdate, 10000);
+        // Vérifie toutes les 5 secondes
+        setInterval(checkForUpdate, 5000);
     </script>
 </body>
 </html>
