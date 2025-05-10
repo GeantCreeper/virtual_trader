@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <title>Liste des actions</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <form action="index.php?p=portfolio" method="post" style="margin-bottom: 20px;">
@@ -154,20 +155,60 @@
                 $result_evolution = $requete_evolution->get_result();
 
                 if ($result_evolution->num_rows > 0) {
+                    $months = [];
+                    $prices = [];
+                    while ($evolution_row = $result_evolution->fetch_assoc()) {
+                        $months[] = htmlspecialchars($evolution_row['month']);
+                        $prices[] = htmlspecialchars(number_format($evolution_row['price'], 2, '.', ''));
+                    }
+
+                    // Convertir les données en JSON pour JavaScript
+                    $months_json = json_encode($months);
+                    $prices_json = json_encode($prices);
+
                     echo "<tr><td colspan='5'>
                             <h3>Évolution du prix sur 12 mois pour $nom</h3>
-                            <table border='1' style='width: 100%; margin: 10px 0;'>
-                                <tr>
-                                    <th>Mois</th>
-                                    <th>Prix (€)</th>
-                                </tr>";
-                    while ($evolution_row = $result_evolution->fetch_assoc()) {
-                        echo "<tr>
-                                <td>" . htmlspecialchars($evolution_row['month']) . "</td>
-                                <td>" . htmlspecialchars(number_format($evolution_row['price'], 2)) . "</td>
-                              </tr>";
-                    }
-                    echo "</table>
+                            <canvas id='chart_$id' width='400' height='200'></canvas>
+                            <script>
+                                const ctx_$id = document.getElementById('chart_$id').getContext('2d');
+                                new Chart(ctx_$id, {
+                                    type: 'line',
+                                    data: {
+                                        labels: $months_json,
+                                        datasets: [{
+                                            label: 'Prix (€)',
+                                            data: $prices_json,
+                                            borderColor: 'rgba(75, 192, 192, 1)',
+                                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                            borderWidth: 2
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        plugins: {
+                                            legend: {
+                                                display: true,
+                                                position: 'top'
+                                            }
+                                        },
+                                        scales: {
+                                            x: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Mois'
+                                                }
+                                            },
+                                            y: {
+                                                title: {
+                                                    display: true,
+                                                    text: 'Prix (€)'
+                                                },
+                                                beginAtZero: false
+                                            }
+                                        }
+                                    }
+                                });
+                            </script>
                           </td></tr>";
                 } else {
                     echo "<tr><td colspan='5'><p>Aucune donnée d'évolution disponible pour cette action.</p></td></tr>";
