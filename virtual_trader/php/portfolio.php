@@ -35,16 +35,16 @@ $user = $_SESSION['user']; // Récupère l'utilisateur connecté
     }
 
     // Étape 1 : Récupérer l'ID de l'utilisateur connecté
-    $stmt_user_id = $connexion->prepare("SELECT user_id FROM user WHERE username = ?");
-    $stmt_user_id->bind_param("s", $user);
-    $stmt_user_id->execute();
-    $result_user_id = $stmt_user_id->get_result();
+    $requete_user_id = $connexion->prepare("SELECT user_id FROM user WHERE username = ?");
+    $requete_user_id->bind_param("s", $user);
+    $requete_user_id->execute();
+    $result_user_id = $requete_user_id->get_result();
     if ($result_user_id->num_rows === 0) {
         echo "<p style='color: red;'>Utilisateur introuvable.</p>";
         exit();
     }
     $user_id = $result_user_id->fetch_assoc()['user_id'];
-    $stmt_user_id->close();
+    $requete_user_id->close();
 
     // Étape 2 : Préparer et exécuter la requête pour le portfolio
     $requete = $connexion->prepare("

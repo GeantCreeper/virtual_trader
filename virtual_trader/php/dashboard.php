@@ -28,10 +28,10 @@
     }
 
     // Récupère l'ID de l'utilisateur et son argent
-    $stmt_user = $connexion->prepare("SELECT user_id, money FROM user WHERE username = ?");
-    $stmt_user->bind_param("s", $user);
-    $stmt_user->execute();
-    $result_user = $stmt_user->get_result();
+    $requete_user = $connexion->prepare("SELECT user_id, money FROM user WHERE username = ?");
+    $requete_user->bind_param("s", $user);
+    $requete_user->execute();
+    $result_user = $requete_user->get_result();
     if ($result_user->num_rows === 0) {
         echo "<p style='color: red;'>Utilisateur introuvable.</p>";
         exit();
@@ -39,44 +39,44 @@
     $user_data = $result_user->fetch_assoc();
     $user_id = $user_data['user_id'];
     $user_money = $user_data['money'];
-    $stmt_user->close();
+    $requete_user->close();
 
     // Vérifie si la valeur totale du portefeuille est inférieure à 1000€
-    $stmt_portfolio_value = $connexion->prepare("
+    $requete_portfolio_value = $connexion->prepare("
         SELECT COALESCE(SUM(w.quantity * a.price), 0) + u.money AS total_value
         FROM wallet w
         INNER JOIN actions a ON w.action_id = a.action_id
         INNER JOIN user u ON w.user_id = u.user_id
         WHERE u.user_id = ?
     ");
-    $stmt_portfolio_value->bind_param("i", $user_id);
-    $stmt_portfolio_value->execute();
-    $result_portfolio_value = $stmt_portfolio_value->get_result();
+    $requete_portfolio_value->bind_param("i", $user_id);
+    $requete_portfolio_value->execute();
+    $result_portfolio_value = $requete_portfolio_value->get_result();
     $total_value = $result_portfolio_value->fetch_assoc()['total_value'];
-    $stmt_portfolio_value->close();
+    $requete_portfolio_value->close();
 
     if ($total_value < 1000) {
         // Supprime toutes les données associées à l'utilisateur
-        $stmt_delete_transactions = $connexion->prepare("DELETE FROM transactions WHERE user_id = ?");
-        $stmt_delete_transactions->bind_param("i", $user_id);
-        $stmt_delete_transactions->execute();
-        $stmt_delete_transactions->close();
+        $requete_delete_transactions = $connexion->prepare("DELETE FROM transactions WHERE user_id = ?");
+        $requete_delete_transactions->bind_param("i", $user_id);
+        $requete_delete_transactions->execute();
+        $requete_delete_transactions->close();
 
-        $stmt_delete_wallet = $connexion->prepare("DELETE FROM wallet WHERE user_id = ?");
-        $stmt_delete_wallet->bind_param("i", $user_id);
-        $stmt_delete_wallet->execute();
-        $stmt_delete_wallet->close();
+        $requete_delete_wallet = $connexion->prepare("DELETE FROM wallet WHERE user_id = ?");
+        $requete_delete_wallet->bind_param("i", $user_id);
+        $requete_delete_wallet->execute();
+        $requete_delete_wallet->close();
 
-        $stmt_delete_portfolio_history = $connexion->prepare("DELETE FROM portfolio_history WHERE user_id = ?");
-        $stmt_delete_portfolio_history->bind_param("i", $user_id);
-        $stmt_delete_portfolio_history->execute();
-        $stmt_delete_portfolio_history->close();
+        $requete_delete_portfolio_history = $connexion->prepare("DELETE FROM portfolio_history WHERE user_id = ?");
+        $requete_delete_portfolio_history->bind_param("i", $user_id);
+        $requete_delete_portfolio_history->execute();
+        $requete_delete_portfolio_history->close();
 
         // Supprime l'utilisateur
-        $stmt_delete_user = $connexion->prepare("DELETE FROM user WHERE user_id = ?");
-        $stmt_delete_user->bind_param("i", $user_id);
-        $stmt_delete_user->execute();
-        $stmt_delete_user->close();
+        $requete_delete_user = $connexion->prepare("DELETE FROM user WHERE user_id = ?");
+        $requete_delete_user->bind_param("i", $user_id);
+        $requete_delete_user->execute();
+        $requete_delete_user->close();
 
         // Envoie un message au BroadcastChannel
         echo "<script>
@@ -91,15 +91,15 @@
     }
 
     // Récupère la date fictive actuelle depuis game_state
-    $stmt_date = $connexion->prepare("SELECT actual_date FROM game_state");
-    $stmt_date->execute();
-    $result_date = $stmt_date->get_result();
+    $requete_date = $connexion->prepare("SELECT actual_date FROM game_state");
+    $requete_date->execute();
+    $result_date = $requete_date->get_result();
     if ($result_date->num_rows > 0) {
         $fictive_date = $result_date->fetch_assoc()['actual_date'];
     } else {
         die("Erreur : Impossible de récupérer la date fictive.");
     }
-    $stmt_date->close();
+    $requete_date->close();
     ?>
 
     <div class="titre">
@@ -113,15 +113,15 @@
         <h2>Liste des actions possédées</h2>
         <?php
         // Récupère les actions possédées
-        $stmt_wallet = $connexion->prepare("
+        $requete_wallet = $connexion->prepare("
             SELECT a.name AS action_name, w.quantity, a.price AS current_price, (w.quantity * a.price) AS total_value
             FROM wallet w
             INNER JOIN actions a ON w.action_id = a.action_id
             WHERE w.user_id = ?
         ");
-        $stmt_wallet->bind_param("i", $user_id);
-        $stmt_wallet->execute();
-        $result_wallet = $stmt_wallet->get_result();
+        $requete_wallet->bind_param("i", $user_id);
+        $requete_wallet->execute();
+        $result_wallet = $requete_wallet->get_result();
 
         if ($result_wallet->num_rows > 0) {
             echo "<table border='1'>
@@ -143,22 +143,22 @@
         } else {
             echo "<p>Vous ne possédez aucune action pour le moment. Achetez des actions pour commencer à constituer votre portefeuille.</p>";
         }
-        $stmt_wallet->close();
+        $requete_wallet->close();
         ?>
 
         <h2>Évolution de la valeur du portefeuille (12 derniers mois)</h2>
         <?php
         // Récupère l'évolution de la valeur du portefeuille sur les 12 derniers mois
-        $stmt_portfolio = $connexion->prepare("
+        $requete_portfolio = $connexion->prepare("
             SELECT DATE_FORMAT(date, '%Y-%m') AS month, value
             FROM portfolio_history
             WHERE user_id = ?
             ORDER BY date DESC
             LIMIT 12
         ");
-        $stmt_portfolio->bind_param("i", $user_id);
-        $stmt_portfolio->execute();
-        $result_portfolio = $stmt_portfolio->get_result();
+        $requete_portfolio->bind_param("i", $user_id);
+        $requete_portfolio->execute();
+        $result_portfolio = $requete_portfolio->get_result();
 
         if ($result_portfolio->num_rows > 0) {
             echo "<table border='1'>
@@ -176,7 +176,7 @@
         } else {
             echo "<p>Aucune donnée disponible pour l'évolution du portefeuille. Commencez à acheter des actions pour voir l'évolution de votre portefeuille.</p>";
         }
-        $stmt_portfolio->close();
+        $requete_portfolio->close();
 
         $connexion->close();
         ?>

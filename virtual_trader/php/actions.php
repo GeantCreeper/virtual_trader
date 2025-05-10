@@ -88,12 +88,12 @@
         $sql .= " WHERE " . implode(" AND ", $conditions);
     }
 
-    $stmt = $connexion->prepare($sql);
+    $requete = $connexion->prepare($sql);
     if ($types) {
-        $stmt->bind_param($types, ...$params);
+        $requete->bind_param($types, ...$params);
     }
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $requete->execute();
+    $result = $requete->get_result();
 
     if ($result->num_rows > 0) {
         echo "<table border='1'>
@@ -138,20 +138,20 @@
 
             // Afficher l'évolution si demandée
             if (isset($_POST['view_evolution']) && $_POST['view_evolution'] == $id) {
-                $stmt_evolution = $connexion->prepare("
+                $requete_evolution = $connexion->prepare("
                     SELECT DATE_FORMAT(date, '%Y-%m') AS month, price
                     FROM action_history
                     WHERE action_id = ?
                     ORDER BY date DESC
                     LIMIT 12
                 ");
-                if (!$stmt_evolution) {
+                if (!$requete_evolution) {
                     die("Erreur dans la requête SQL : " . $connexion->error);
                 }
 
-                $stmt_evolution->bind_param("i", $id);
-                $stmt_evolution->execute();
-                $result_evolution = $stmt_evolution->get_result();
+                $requete_evolution->bind_param("i", $id);
+                $requete_evolution->execute();
+                $result_evolution = $requete_evolution->get_result();
 
                 if ($result_evolution->num_rows > 0) {
                     echo "<tr><td colspan='5'>
@@ -173,7 +173,7 @@
                     echo "<tr><td colspan='5'><p>Aucune donnée d'évolution disponible pour cette action.</p></td></tr>";
                 }
 
-                $stmt_evolution->close();
+                $requete_evolution->close();
             }
         }
         echo "</table>";
@@ -181,7 +181,7 @@
         echo "<p>Aucune action trouvée.</p>";
     }
 
-    $stmt->close();
+    $requete->close();
     $connexion->close();
     ?>
     <script>
