@@ -1,4 +1,3 @@
-<!-- Ce fichier permet de compléter un formulaire de connexion -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
